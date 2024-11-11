@@ -1,6 +1,6 @@
 CXX           = g++
 
-TREE_SRC      = main.cpp binaryTree.cpp
+TREE_SRC      = main.cpp
 
 TARGET        = binaryTree
 
@@ -42,10 +42,7 @@ vpath %.cpp $(SRC_DIR)
 all:
 	@make -s clean
 	make quickTree
-	@mkdir -p graphVizDumps
-	@touch graphVizDumps/graphVizDump.html
 	@printf "\n$(CYAN_TEXT)RUNNING...\n\n$(DEFAULT_TEXT)"
-	@$(addprefix $(BUILD_DIR), $(TARGET))
 
 $(TARGET): $(BUILD_DIR) $(OBJECT)
 	$(CXX)   $(BUILD_OBJ) -o $(TARGET) -D _NDEBUG
@@ -62,6 +59,7 @@ quickTree: $(addprefix $(SRC_DIR), $(TREE_SRC))
 	@$(CXX) $(CFLAGS) $^ $(SUBMODULE_SRC) -o $(addprefix $(BUILD_DIR), $(TARGET))
 
 clean:
-	@printf "$(GREEN_TEXT)► $(CYAN_TEXT)build/ $(DEFAULT_BOLD_TEXT)and $(CYAN_TEXT)dumps/ $(DEFAULT_BOLD_TEXT)were removed!\n$(DEFAULT_TEXT)"
+	@printf "$(GREEN_TEXT)► $(CYAN_TEXT)build/ $(DEFAULT_BOLD_TEXT)and$(CYAN_TEXT) dumpFolder/ $(DEFAULT_BOLD_TEXT)were removed!\n$(DEFAULT_TEXT)"
 	@rm -rf build
-	@rm -rf graphVizDumps/graphVizDump.html
+	@rm -rf temp.dot
+	@rm -rf dumpFolder
