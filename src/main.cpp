@@ -1,11 +1,34 @@
 #include "binaryTree.h"
 
-int main() {
-  binaryTree tree = {};
+#include "getopt.h"
 
-  binaryTreeInitialize(&tree, "ДЕД");
+#include "consoleParser.h"
 
-  binaryTreeNodeCreate(&tree, "ЛОХ");
+#define INIT_BINARY_TREE(treePtr, rootValue) {                                         \
+  binaryTreeInitialize(treePtr, rootValue);                                            \
+  binaryTreeInfoInitialize(treePtr, __FILE__, __PRETTY_FUNCTION__, __LINE__);          \
+  parseConsole(argc, argv, treePtr);                                                   \
+  binaryTreeSetInfo(treePtr);                                                          \
+}
 
-  printBinaryTree     (tree.root);
+int main(int argc, char *argv[]) {
+  binaryTree<int> intTree = {};
+  INIT_BINARY_TREE(&intTree, 100);
+
+  binaryTreeNodeCreate(&intTree, 200);
+  binaryTreeNodeCreate(&intTree, 12);
+  binaryTreeNodeCreate(&intTree, 1488);
+  binaryTreeNodeCreate(&intTree, 228);
+
+  binaryTreeDump(&intTree);
+
+  printBinaryTree(intTree.root);
+
+  // binaryTree<const char*> charTree = {};
+  // binaryTreeInitialize(&charTree, "DED");
+  // binaryTreeNodeCreate(&charTree, "LOX");
+  // printBinaryTree(charTree.root);
+  // binaryTreeDestruct(&charTree);
+
+  binaryTreeDestruct(&intTree);
 }
