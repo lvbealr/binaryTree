@@ -34,17 +34,17 @@ const size_t MAX_CMD_BUFFER_SIZE  = 100;
 }
 
 struct binaryTreeInfo {
-  char *bornFileName         = {};
-  char *bornFunctionName     = {};
-  int bornLine               = {};
-  char *dumpFolderName       = {};
-  const char *dumpFileName   = {};
-  char *lastUsedFileName     = {};
-  char *lastUsedFunctionName = {};
-  int lastUsedLine           = {};
-  char *htmlDumpPath         = {};
+  char       *bornFileName         = {};
+  char       *bornFunctionName     = {};
+  int         bornLine             = {};
+  char       *dumpFolderName       = {};
+  const char *dumpFileName         = {};
+  char       *lastUsedFileName     = {};
+  char       *lastUsedFunctionName = {};
+  int         lastUsedLine         = {};
+  char       *htmlDumpPath         = {};
 
-  char *dataBasePath         = {}; // TODO only akinator
+  char       *dataBasePath         = {}; // TODO only akinator
 };
 
 template<typename DT>
@@ -278,7 +278,7 @@ template<typename DT> binaryTreeError binaryTreeDump(binaryTree<DT> *tree) {
   CHECK_ERROR(tree, dumpFile != NULL, DUMP_FILE_BAD_POINTER);
 
   // .DOT HEADER //
-  fprintf(dumpFile, "digraph binaryTree {\nsplines=curved;\nrankdir=HR;\nnodesep=0.4;"
+  fprintf(dumpFile, "digraph binaryTree {\nsplines=ortho;\nrankdir=HR;\nnodesep=0.4;"
                     "\nnode [shape=record, fontname=\"JetBrains Mono\", fontsize=\"10\", color=\"gray\", style=\"rounded\"];\n"
                     "edge [style=dashed, color=\"green\", weight=\"10\", penwidth=\"2\", "
                     "arrowsize=\"0.4\"];\n");
