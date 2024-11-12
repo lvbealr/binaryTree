@@ -15,8 +15,8 @@
 
 #include "customWarning.h"
 
-const size_t MAX_FILE_NAME_SIZE   =  50;
-const size_t MAX_BORN_FUNC_NAME   =  50;
+const size_t MAX_FILE_NAME_SIZE   =  100;
+const size_t MAX_BORN_FUNC_NAME   =  100;
 const int    MAX_LINE_LENGTH      =   4;
 const size_t MAX_DUMP_FOLDER_NAME =  20;
 const size_t MAX_DUMP_FILE_NAME   =  50;
@@ -37,10 +37,10 @@ const size_t MAX_HEADER_SIZE      = 500;
 }
 
 #define DUMP_(treePtr) { \
-  (treePtr)->infoData->lastUsedFileName     = (char *)__FILE__;            \
-  (treePtr)->infoData->lastUsedFunctionName = (char *)__PRETTY_FUNCTION__; \
-  (treePtr)->infoData->lastUsedLine         =         __LINE__;            \
-  binaryTreeDump(treePtr);                                                 \
+  strncpy((treePtr)->infoData->lastUsedFileName,     __FILE__,            MAX_FILE_NAME_SIZE); \
+  strncpy((treePtr)->infoData->lastUsedFunctionName, __PRETTY_FUNCTION__, MAX_FILE_NAME_SIZE); \
+  (treePtr)->infoData->lastUsedLine  =               __LINE__                                ; \
+  binaryTreeDump(treePtr);                                                                     \
 }
 
 #define SAVE_DUMP_IMAGE(treePtr) { \
@@ -155,6 +155,7 @@ template<typename DT> binaryTreeError binaryTreeDestruct(binaryTree<DT> *tree) {
   }
 
   DUMP_(tree);
+
   binaryTreeInfoDestruct(tree);
 
   return NO_ERRORS;
@@ -311,7 +312,9 @@ template<typename DT> binaryTreeError binaryTreeInfoDestruct(binaryTree<DT> *tre
   FREE_(tree->infoData->bornFileName        );
   FREE_(tree->infoData->bornFunctionName    );
   FREE_(tree->infoData->dumpFolderName      );
+  tree->infoData->lastUsedFileName       = {};
   FREE_(tree->infoData->lastUsedFileName    );
+  tree->infoData->lastUsedFunctionName   = {};
   FREE_(tree->infoData->lastUsedFunctionName);
   FREE_(tree->infoData->htmlDumpPath        );
   FREE_(tree->infoData->dataBasePath        ); // TODO ONLY AKINATOR
