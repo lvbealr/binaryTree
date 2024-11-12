@@ -58,6 +58,7 @@ const size_t MAX_HEADER_SIZE      = 500;
   system(buffer);                                                       \
                                                                         \
   FREE_(buffer);                                                        \
+  FREE_(newFileName);                                                   \
 }
 
 struct binaryTreeInfo {
@@ -115,6 +116,7 @@ template<typename DT> binaryTreeError printBinaryTree         (node<DT>       *r
 template<typename DT> binaryTreeError binaryTreeInfoInitialize(binaryTree<DT> *tree, const char *fileName,
                                                                                      const char *funcName,
                                                                                      int   line                  );
+template<typename DT> binaryTreeError binaryTreeInfoDestruct  (binaryTree<DT> *tree                              );
 template<typename DT> binaryTreeError binaryTreeSetInfo       (binaryTree<DT> *tree                              );
 template<typename DT> binaryTreeError binaryTreeDump          (binaryTree<DT> *tree                              );
 template<typename DT> binaryTreeError binaryTreeNodeDumpLink  (FILE *dumpFile,              node<DT> *node       );
@@ -153,6 +155,7 @@ template<typename DT> binaryTreeError binaryTreeDestruct(binaryTree<DT> *tree) {
   }
 
   DUMP_(tree);
+  binaryTreeInfoDestruct(tree);
 
   return NO_ERRORS;
 }
@@ -280,7 +283,6 @@ template<typename DT> binaryTreeError binaryTreeInfoInitialize(binaryTree<DT> *t
   tree->infoData->bornFunctionName     = (char *)calloc(MAX_BORN_FUNC_NAME,   sizeof(char));
   tree->infoData->bornLine             = line;
   tree->infoData->dumpFolderName       = (char *)calloc(MAX_DUMP_FOLDER_NAME, sizeof(char));
-  tree->infoData->dumpFileName         = (char *)calloc(MAX_DUMP_FILE_NAME,   sizeof(char));
   tree->infoData->lastUsedFileName     = (char *)calloc(MAX_FILE_NAME_SIZE,   sizeof(char));
   tree->infoData->lastUsedFunctionName = (char *)calloc(MAX_BORN_FUNC_NAME,   sizeof(char));
   tree->infoData->lastUsedLine         = line;
@@ -290,7 +292,6 @@ template<typename DT> binaryTreeError binaryTreeInfoInitialize(binaryTree<DT> *t
   CHECK_ERROR(tree, tree->infoData->bornFileName         != NULL, INFO_NULL_POINTER);
   CHECK_ERROR(tree, tree->infoData->bornFunctionName     != NULL, INFO_NULL_POINTER);
   CHECK_ERROR(tree, tree->infoData->dumpFolderName       != NULL, INFO_NULL_POINTER);
-  CHECK_ERROR(tree, tree->infoData->dumpFileName         != NULL, INFO_NULL_POINTER);
   CHECK_ERROR(tree, tree->infoData->lastUsedFileName     != NULL, INFO_NULL_POINTER);
   CHECK_ERROR(tree, tree->infoData->lastUsedFunctionName != NULL, INFO_NULL_POINTER);
   CHECK_ERROR(tree, tree->infoData->htmlDumpPath         != NULL, INFO_NULL_POINTER);
@@ -302,6 +303,26 @@ template<typename DT> binaryTreeError binaryTreeInfoInitialize(binaryTree<DT> *t
   // TODO set default path to database (akinator) and ONLY htmldump if user didn't set them by console
 
   return NO_ERRORS;
+}
+
+template<typename DT> binaryTreeError binaryTreeInfoDestruct(binaryTree<DT> *tree) {
+  customWarning(tree != NULL, TREE_BAD_POINTER);
+
+  FREE_(tree->infoData->bornFileName        );
+  FREE_(tree->infoData->bornFunctionName    );
+  FREE_(tree->infoData->dumpFolderName      );
+  FREE_(tree->infoData->lastUsedFileName    );
+  FREE_(tree->infoData->lastUsedFunctionName);
+  FREE_(tree->infoData->htmlDumpPath        );
+  FREE_(tree->infoData->dataBasePath        ); // TODO ONLY AKINATOR
+
+  tree->infoData->dumpFileName = {};
+  tree->infoData->bornLine     = 0;
+
+  FREE_(tree->infoData);
+
+  return NO_ERRORS;
+
 }
 
 template<typename DT> binaryTreeError binaryTreeSetInfo(binaryTree<DT> *tree) {
