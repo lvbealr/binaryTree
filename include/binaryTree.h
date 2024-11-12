@@ -4,6 +4,8 @@
 // TODO убрать поля структур и тд для акинатора из дерева
 // TODO дерево это стандартная структура, лишнее здесь не надо
 
+// TODO verify
+
 #include <cstdlib>
 #include <cinttypes>
 #include <ctime>
@@ -20,6 +22,7 @@ const size_t MAX_DUMP_FOLDER_NAME =  20;
 const size_t MAX_DUMP_FILE_NAME   =  50;
 const size_t MAX_PATH_TO_FILE     = 100;
 const size_t MAX_CMD_BUFFER_SIZE  = 100;
+const size_t MAX_HEADER_SIZE      = 500;
 
 #define FREE_(field) { \
   free(field);         \
@@ -31,6 +34,30 @@ const size_t MAX_CMD_BUFFER_SIZE  = 100;
     (treePtr)->errorCode |= error;                \
     return error;                                 \
   }                                               \
+}
+
+#define DUMP_(treePtr) { \
+  (treePtr)->infoData->lastUsedFileName     = (char *)__FILE__;            \
+  (treePtr)->infoData->lastUsedFunctionName = (char *)__PRETTY_FUNCTION__; \
+  (treePtr)->infoData->lastUsedLine         =         __LINE__;            \
+  binaryTreeDump(treePtr);                                                 \
+}
+
+#define SAVE_DUMP_IMAGE(treePtr) { \
+  char *buffer = (char *)calloc(MAX_CMD_BUFFER_SIZE, sizeof(char));     \
+  customWarning(buffer != NULL, BAD_BUFFER_POINTER);                    \
+                                                                        \
+  char *newFileName = (char *)calloc(MAX_FILE_NAME_SIZE, sizeof(char)); \
+  customWarning(newFileName != NULL, BAD_FILE_NAME_POINTER);            \
+                                                                        \
+  strncpy(newFileName, (treePtr)->infoData->htmlDumpPath,               \
+  strlen((treePtr)->infoData->htmlDumpPath) - strlen(".html"));         \
+                                                                        \
+  snprintf(buffer, MAX_CMD_BUFFER_SIZE, "dot -Tsvg %s -o %s.svg",       \
+          (treePtr)->infoData->dumpFileName, newFileName);              \
+  system(buffer);                                                       \
+                                                                        \
+  FREE_(buffer);                                                        \
 }
 
 struct binaryTreeInfo {
@@ -63,6 +90,7 @@ struct binaryTree : node<DT> {
 };
 
 enum binaryTreeError {
+  NO_SUCH_FILE          = -1,
   NO_ERRORS             =  0,
   TREE_BAD_POINTER      =  1,
   NODE_BAD_POINTER      =  2,
@@ -79,7 +107,8 @@ enum binaryTreeError {
 
 // TREE FUNCTION PROTOTYPES //
 template<typename DT> binaryTreeError binaryTreeInitialize    (binaryTree<DT> *tree,        DT rootData          );
-template<typename DT> binaryTreeError binaryTreeDestruct      (node<DT>       *currentNode                       );
+template<typename DT> binaryTreeError binaryTreeDestruct      (binaryTree<DT> *tree                              );
+template<typename DT> binaryTreeError binaryTreeNodeDestruct  (binaryTree<DT> *tree,        node<DT> **node      );
 template<typename DT> binaryTreeError binaryTreeNodeCreate    (binaryTree<DT> *tree,        DT data              );
 template<typename DT> binaryTreeError binaryTreeNodeLink      (node<DT>       *parentNode,  node<DT> *node       );
 template<typename DT> binaryTreeError printBinaryTree         (node<DT>       *root                              );
@@ -89,10 +118,11 @@ template<typename DT> binaryTreeError binaryTreeInfoInitialize(binaryTree<DT> *t
 template<typename DT> binaryTreeError binaryTreeSetInfo       (binaryTree<DT> *tree                              );
 template<typename DT> binaryTreeError binaryTreeDump          (binaryTree<DT> *tree                              );
 template<typename DT> binaryTreeError binaryTreeNodeDumpLink  (FILE *dumpFile,              node<DT> *node       );
+template<typename DT> binaryTreeError writeHtmlHeader         (binaryTree<DT> *tree                              );
 // TREE FUNCTION PROTOTYPES //
 
 // OTHER FUNCTION PROTOTYPES //
-template<typename DT> char           *setDumpFileName         (binaryTree<DT> *dumpFolder);
+template<typename DT> char           *setDumpFileName         (binaryTree<DT> *tree);
 // OTHER FUNCTION PROTOTYPES //
 
 template<typename DT> binaryTreeError binaryTreeInitialize(binaryTree<DT> *tree, DT rootData) {
@@ -113,9 +143,35 @@ template<typename DT> binaryTreeError binaryTreeInitialize(binaryTree<DT> *tree,
   return NO_ERRORS;
 }
 
-template<typename DT> binaryTreeError binaryTreeDestruct(node<DT> *currentNode) {
-  customWarning(currentNode != NULL, NODE_BAD_POINTER);
-  // TODO
+template<typename DT> binaryTreeError binaryTreeDestruct(binaryTree<DT> *tree) {
+  customWarning(tree != NULL, TREE_BAD_POINTER);
+
+  SAVE_DUMP_IMAGE(tree);
+
+  if (tree->root) {
+    binaryTreeNodeDestruct(tree, &(tree->root));
+  }
+
+  DUMP_(tree);
+
+  return NO_ERRORS;
+}
+
+template<typename DT> binaryTreeError binaryTreeNodeDestruct(binaryTree<DT> *tree, node<DT> **node) {
+  customWarning(*node != NULL, NODE_BAD_POINTER);
+
+  if ((*node)->left) {
+    binaryTreeNodeDestruct(tree, &((*node)->left));
+  }
+
+  if ((*node)->right) {
+    binaryTreeNodeDestruct(tree, &((*node)->right));
+  }
+
+  DUMP_(tree)
+
+  FREE_(*node);
+
   return NO_ERRORS;
 }
 
@@ -133,6 +189,8 @@ template<typename DT> binaryTreeError binaryTreeNodeCreate(binaryTree<DT> *tree,
   if (binaryTreeNodeLink(tree->root, treeNode) == NODE_VALUE_EXIST) {
     FREE_(treeNode);
   }
+
+  DUMP_(tree);
 
   return NO_ERRORS;
 }
@@ -294,11 +352,22 @@ template<typename DT> binaryTreeError binaryTreeDump(binaryTree<DT> *tree) {
   char *buffer = (char *)calloc(MAX_CMD_BUFFER_SIZE, sizeof(char));
   CHECK_ERROR(tree, buffer != NULL, BAD_BUFFER_POINTER);
 
-  printf("DUMP FILE: %s\n", tree->infoData->dumpFileName);
   fclose(dumpFile);
 
-  snprintf(buffer, MAX_CMD_BUFFER_SIZE, "dot -Tsvg %s >> temp.svg && cat temp.svg > %s",
+  snprintf(buffer, MAX_CMD_BUFFER_SIZE, "echo '<div>' >> %s", tree->infoData->htmlDumpPath);
+  system(buffer);
+
+  *buffer = {};
+
+  writeHtmlHeader(tree);
+
+  snprintf(buffer, MAX_CMD_BUFFER_SIZE, "dot -Tsvg %s >> %s",
           tree->infoData->dumpFileName, tree->infoData->htmlDumpPath);
+  system(buffer);
+
+  *buffer = {};
+
+  snprintf(buffer, MAX_CMD_BUFFER_SIZE, "echo '</div><hr size='2' color='#ff9900'>' >> %s", tree->infoData->htmlDumpPath);
   system(buffer);
 
   *buffer = {};
@@ -342,6 +411,30 @@ template<typename DT> binaryTreeError binaryTreeNodeDumpLink(FILE *dumpFile, nod
     fprintf(dumpFile, "p%p:<r> -> p%p\n", node, node->right);
     binaryTreeNodeDumpLink(dumpFile, node->right);
   }
+
+  return NO_ERRORS;
+}
+
+template<typename DT> binaryTreeError writeHtmlHeader(binaryTree<DT> *tree) {
+  customWarning(tree != NULL, TREE_BAD_POINTER);
+
+  char *header = (char *)calloc(MAX_HEADER_SIZE, sizeof(char));
+  customWarning(header != NULL, BAD_INFO_POINTER);
+
+  snprintf(header, MAX_HEADER_SIZE, "<br><br><div style='font-size:22px'><b><u>linkedList</u><font color='DeepSkyBlue'>" " [%p]" "</font></b>"
+                                    " at <b><u>%s:%d</u> <u>(%s)</u></b> <font color='DarkOrange'><b><br>born at</b></font>"
+                                    " <b><u>%s:%d</u></b> (%s)<br><br></div>",
+          tree, tree->infoData->lastUsedFileName, tree->infoData->lastUsedLine, tree->infoData->lastUsedFunctionName,
+                tree->infoData->bornFileName,     tree->infoData->bornLine,     tree->infoData->bornFunctionName);
+
+  int openFile = open(tree->infoData->htmlDumpPath, O_WRONLY | O_APPEND);
+  customWarning(openFile != NO_SUCH_FILE, NO_SUCH_FILE);
+
+  ssize_t writeFile = write(openFile, header, MAX_HEADER_SIZE);
+
+  close(openFile);
+
+  FREE_(header);
 
   return NO_ERRORS;
 }
