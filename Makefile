@@ -59,7 +59,5 @@ quickTree: $(addprefix $(SRC_DIR), $(TREE_SRC))
 	@$(CXX) $(CFLAGS) $^ $(SUBMODULE_SRC) -o $(addprefix $(BUILD_DIR), $(TARGET))
 
 clean:
-	@printf "$(GREEN_TEXT)► $(CYAN_TEXT)build/ $(DEFAULT_BOLD_TEXT)and$(CYAN_TEXT) dumpFolder/ $(DEFAULT_BOLD_TEXT)were removed!\n$(DEFAULT_TEXT)"
+	@printf "$(GREEN_TEXT)► $(CYAN_TEXT)build/ $(DEFAULT_BOLD_TEXT)was removed!\n$(DEFAULT_TEXT)"
 	@rm -rf build
-	@rm -rf temp.dot
-	@rm -rf dumpFolder
