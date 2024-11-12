@@ -9,6 +9,7 @@
   binaryTreeInfoInitialize(treePtr, __FILE__, __PRETTY_FUNCTION__, __LINE__);          \
   parseConsole(argc, argv, treePtr);                                                   \
   binaryTreeSetInfo(treePtr);                                                          \
+  DUMP_(treePtr);                                                                      \
 }
 
 int main(int argc, char *argv[]) {
@@ -19,16 +20,13 @@ int main(int argc, char *argv[]) {
   binaryTreeNodeCreate(&intTree, 12);
   binaryTreeNodeCreate(&intTree, 1488);
   binaryTreeNodeCreate(&intTree, 228);
-
-  binaryTreeDump(&intTree);
-
-  printBinaryTree(intTree.root);
-
-  // binaryTree<const char*> charTree = {};
-  // binaryTreeInitialize(&charTree, "DED");
-  // binaryTreeNodeCreate(&charTree, "LOX");
-  // printBinaryTree(charTree.root);
-  // binaryTreeDestruct(&charTree);
+  binaryTreeNodeCreate(&intTree, 50);
+  binaryTreeNodeCreate(&intTree, 37);
+  binaryTreeNodeCreate(&intTree, 98);
+  binaryTreeNodeCreate(&intTree, 1002);
+  binaryTreeNodeCreate(&intTree, 1323);
+  binaryTreeNodeCreate(&intTree, 11);
+  binaryTreeNodeCreate(&intTree, 2);
 
   binaryTreeDestruct(&intTree);
 }
