@@ -1,16 +1,7 @@
-#include "binaryTree.h"
-
 #include "getopt.h"
 
 #include "consoleParser.h"
-
-#define INIT_BINARY_TREE(treePtr, rootValue) {                                         \
-  binaryTreeInitialize(treePtr, rootValue);                                            \
-  binaryTreeInfoInitialize(treePtr, __FILE__, __PRETTY_FUNCTION__, __LINE__);          \
-  parseConsole(argc, argv, treePtr);                                                   \
-  binaryTreeSetInfo(treePtr);                                                          \
-  DUMP_(treePtr);                                                                      \
-}
+#include "binaryTree.h"
 
 int main(int argc, char *argv[]) {
   binaryTree<int> intTree = {};

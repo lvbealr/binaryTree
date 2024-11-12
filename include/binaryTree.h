@@ -24,6 +24,14 @@ const size_t MAX_PATH_TO_FILE     = 100;
 const size_t MAX_CMD_BUFFER_SIZE  = 100;
 const size_t MAX_HEADER_SIZE      = 500;
 
+#define INIT_BINARY_TREE(treePtr, rootValue) {                                         \
+  binaryTreeInitialize(treePtr, rootValue);                                            \
+  binaryTreeInfoInitialize(treePtr, __FILE__, __PRETTY_FUNCTION__, __LINE__);          \
+  parseConsole(argc, argv, treePtr);                                                   \
+  binaryTreeSetInfo(treePtr);                                                          \
+  DUMP_(treePtr);                                                                      \
+}
+
 #define FREE_(field) { \
   free(field);         \
   field = NULL;        \
