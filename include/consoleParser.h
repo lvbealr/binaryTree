@@ -24,7 +24,7 @@
   #define PRINT_OPTION()
 #endif // _NDEBUG
 
-static const size_t MAX_OPTIONS_COUNT = 2;
+static const size_t MAX_OPTIONS_COUNT = 1;
 
 template<typename DT>
 void parseConsole(int argc, char *argv[], binaryTree<DT> *tree) {
@@ -32,18 +32,12 @@ void parseConsole(int argc, char *argv[], binaryTree<DT> *tree) {
   option options[MAX_OPTIONS_COUNT]   = {};
 
   INIT_OPTION(options, "dumpFolder", 2, 'd', 0);
-  INIT_OPTION(options, "dataBase",   2, 'b', 0); // TODO only akinator
 
   int   gotOption    = 0;
   while ((gotOption = getopt_long(argc, argv, "2", options, NULL)) != -1) {
     PRINT_OPTION();
 
     switch (gotOption) {
-      case 'b': {
-        strncpy(tree->infoData->dataBasePath,   optarg, MAX_FILE_NAME_SIZE); // TODO only akinator
-        break;
-      }
-
       case 'd': {
         strncpy(tree->infoData->dumpFolderName, optarg, MAX_DUMP_FILE_NAME);
         break;

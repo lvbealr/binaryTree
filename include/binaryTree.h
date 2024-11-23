@@ -1,11 +1,6 @@
 #ifndef BINARY_TREE_H_
 #define BINARY_TREE_H_
 
-// TODO убрать поля структур и тд для акинатора из дерева
-// TODO дерево это стандартная структура, лишнее здесь не надо
-
-// TODO verify
-
 #include <cstdlib>
 #include <cinttypes>
 #include <ctime>
@@ -79,8 +74,6 @@ struct binaryTreeInfo {
   char       *lastUsedFunctionName = {};
   int         lastUsedLine         = {};
   char       *htmlDumpPath         = {};
-
-  char       *dataBasePath         = {}; // TODO only akinator
 };
 
 template<typename DT>
@@ -296,7 +289,6 @@ template<typename DT> binaryTreeError binaryTreeInfoInitialize(binaryTree<DT> *t
   tree->infoData->lastUsedFunctionName = (char *)calloc(MAX_BORN_FUNC_NAME,   sizeof(char));
   tree->infoData->lastUsedLine         = line;
   tree->infoData->htmlDumpPath         = (char *)calloc(MAX_DUMP_FILE_NAME,   sizeof(char));
-  tree->infoData->dataBasePath         = (char *)calloc(MAX_FILE_NAME_SIZE,   sizeof(char)); // TODO only akinator
 
   CHECK_ERROR(tree, tree->infoData->bornFileName         != NULL, INFO_NULL_POINTER);
   CHECK_ERROR(tree, tree->infoData->bornFunctionName     != NULL, INFO_NULL_POINTER);
@@ -304,12 +296,9 @@ template<typename DT> binaryTreeError binaryTreeInfoInitialize(binaryTree<DT> *t
   CHECK_ERROR(tree, tree->infoData->lastUsedFileName     != NULL, INFO_NULL_POINTER);
   CHECK_ERROR(tree, tree->infoData->lastUsedFunctionName != NULL, INFO_NULL_POINTER);
   CHECK_ERROR(tree, tree->infoData->htmlDumpPath         != NULL, INFO_NULL_POINTER);
-  CHECK_ERROR(tree, tree->infoData->dataBasePath         != NULL, INFO_NULL_POINTER);        // TODO only akinator
 
   strncpy(tree->infoData->bornFileName,     fileName, MAX_FILE_NAME_SIZE);
   strncpy(tree->infoData->bornFunctionName, funcName, MAX_BORN_FUNC_NAME);
-
-  // TODO set default path to database (akinator) and ONLY htmldump if user didn't set them by console
 
   return NO_ERRORS;
 }
@@ -325,7 +314,6 @@ template<typename DT> binaryTreeError binaryTreeInfoDestruct(binaryTree<DT> *tre
   tree->infoData->lastUsedFunctionName   = {};
   FREE_(tree->infoData->lastUsedFunctionName);
   FREE_(tree->infoData->htmlDumpPath        );
-  FREE_(tree->infoData->dataBasePath        ); // TODO ONLY AKINATOR
 
   tree->infoData->dumpFileName = {};
   tree->infoData->bornLine     = 0;
