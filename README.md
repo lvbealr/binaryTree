@@ -1,6 +1,6 @@
 <p align="center">
   <a href="" rel="noopener">
- <img src="https://i.imgur.com/YOA0cYP.png" alt="Project logo"></a>
+ <img src="https://i.imgur.com/jGCZSn2.png" alt="Project logo"></a>
 </p>
 
 ## 📝 Table of Contents
@@ -79,7 +79,7 @@ The following functions are provided for working with a doubly linked list:
 
 ## ⌛ GraphViz Dump <a name = "graphviz"></a>
 
-  To debug a doubly linked list, it is possible to create a graphic dump and save it in **.html** and **.svg** files
+To debug a doubly linked list, it is possible to create a graphic dump and save it in **.html** and **.svg** files
 
 <img src="https://i.imgur.com/Ew3JufA.png" alt="graphViz dump"></a>
 
