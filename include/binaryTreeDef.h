@@ -78,22 +78,22 @@ struct binaryTree {
 };
 
 template<typename DT>
-binaryTreeError treeInitialize       (binaryTree<DT> *tree);
+binaryTreeError treeInitialize         (binaryTree<DT> *tree);
 template<typename DT>
-binaryTreeError treeDestruct         (binaryTree<DT> *tree);
+binaryTreeError treeDestruct           (binaryTree<DT> *tree);
 template<typename DT>
-binaryTreeError nodeInitialize       (binaryTree<DT> *tree, node<DT>      **currentNode);
+binaryTreeError nodeInitialize         (binaryTree<DT> *tree, node<DT>      **currentNode);
 template<typename DT>
-binaryTreeError nodeLink             (binaryTree<DT> *tree, node<DT>       *currentNode, linkDirection direction);
+binaryTreeError nodeLink               (binaryTree<DT> *tree, node<DT>       *currentNode, linkDirection direction);
 template<typename DT>
-binaryTreeError nodeDestruct         (binaryTree<DT> *tree, node<DT>      **node);
+binaryTreeError nodeDestruct           (binaryTree<DT> *tree, node<DT>      **node);
 
 template<typename DT>
-binaryTreeError callPrintBinaryTree  (binaryTree<DT> *tree, printType type,        FILE *stream);
+binaryTreeError callPrintBinaryTree    (binaryTree<DT> *tree, printType type,        FILE *stream);
 template<typename DT>
-binaryTreeError printBinaryTree      (node<DT>       *currentNode, printType type, FILE *stream);
+binaryTreeError printBinaryTree        (node<DT>       *currentNode, printType type, FILE *stream);
 template<typename DT>
-binaryTreeError printNode            (node<DT>       *currentNode,                 FILE *stream);
+binaryTreeError printNode              (node<DT>       *currentNode,                 FILE *stream);
 
 template<typename DT>
 binaryTreeError treeInfoInitialize     (binaryTree<DT> *tree, const char *fileName,

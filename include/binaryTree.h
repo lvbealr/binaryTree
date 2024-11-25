@@ -41,10 +41,10 @@
 }
 
 #define BINARY_TREE_INITIALIZE(pointer) {                               \
-  treeInitialize(pointer);                                              \
+  treeInitialize    (pointer);                                          \
   treeInfoInitialize(pointer, __FILE__, __PRETTY_FUNCTION__, __LINE__); \
-  parseConsole(argc, argv, pointer);                                    \
-  binaryTreeSetInfo(pointer);                                           \
+  parseConsole      (argc, argv, pointer);                              \
+  binaryTreeSetInfo (pointer);                                          \
 }
 
 template<typename DT>
@@ -96,7 +96,7 @@ inline binaryTreeError nodeInitialize  (binaryTree<DT> *tree, node<DT>      **cu
 
 template<typename DT>
 inline binaryTreeError nodeLink        (binaryTree<DT> *tree, node<DT> *currentNode, linkDirection direction) {
-  customWarning(tree != NULL, TREE_NULL_POINTER);
+  customWarning(tree        != NULL, TREE_NULL_POINTER);
   customWarning(currentNode != NULL, NODE_NULL_POINTER);
 
   node<DT> **childNode = NULL;
@@ -129,10 +129,10 @@ inline binaryTreeError nodeLink        (binaryTree<DT> *tree, node<DT> *currentN
   node<DT> *newNode = {};
   nodeInitialize(tree, &newNode);
 
-  newNode->parent =    currentNode;
-  newNode->left   =    NULL;
-  newNode->right  =    NULL;
-  *childNode          = newNode;
+  newNode->parent = currentNode;
+  newNode->left   =        NULL;
+  newNode->right  =        NULL;
+  *childNode      =     newNode;
 
   DUMP_(tree);
 
@@ -170,7 +170,7 @@ inline binaryTreeError callPrintBinaryTree (binaryTree<DT> *tree, printType type
 template<typename DT>
 inline binaryTreeError printBinaryTree     (node<DT>       *currentNode, printType type, FILE *stream) {
   customWarning(currentNode   != NULL, NODE_NULL_POINTER);
-  customWarning(stream != NULL, BAD_STREAM_POINTER);
+  customWarning(stream        != NULL, BAD_STREAM_POINTER);
 
   fprintf(stream, "( )");
 
@@ -273,7 +273,7 @@ inline binaryTreeError binaryTreeInfoDestruct(binaryTree<DT> *tree) {
 template<typename DT>
 static char *setDumpFileName(binaryTree<DT> *tree) {
   const time_t currentTime = time(NULL);
-  tm localTime = *localtime(&currentTime);
+  tm localTime             = *localtime(&currentTime);
 
   char *fileName = (char *)calloc(MAX_FILE_NAME_SIZE, sizeof(char));
 
