@@ -2,42 +2,16 @@
 #define BINARY_TREE_H_
 
 #include <cstdlib>
-#include <cinttypes>
 #include <ctime>
+#include <cinttypes>
 #include <fcntl.h>
 #include <unistd.h>
 #include <cstring>
 
+#include "binaryTreeDef.h"
 #include "customWarning.h"
-
-const size_t MAX_FILE_NAME_SIZE   =  100;
-const size_t MAX_BORN_FUNC_NAME   =  100;
-const int    MAX_LINE_LENGTH      =   4;
-const size_t MAX_DUMP_FOLDER_NAME =  20;
-const size_t MAX_DUMP_FILE_NAME   =  50;
-const size_t MAX_PATH_TO_FILE     = 100;
-const size_t MAX_CMD_BUFFER_SIZE  = 100;
-const size_t MAX_HEADER_SIZE      = 500;
-
-#define INIT_BINARY_TREE(treePtr, rootValue) {                                         \
-  binaryTreeInitialize(treePtr, rootValue);                                            \
-  binaryTreeInfoInitialize(treePtr, __FILE__, __PRETTY_FUNCTION__, __LINE__);          \
-  parseConsole(argc, argv, treePtr);                                                   \
-  binaryTreeSetInfo(treePtr);                                                          \
-  DUMP_(treePtr);                                                                      \
-}
-
-#define FREE_(field) { \
-  free(field);         \
-  field = NULL;        \
-}
-
-#define CHECK_ERROR(treePtr, expression, error) { \
-  if (!(expression)) {                            \
-    (treePtr)->errorCode |= error;                \
-    return error;                                 \
-  }                                               \
-}
+#include "binaryTreeDump.h"
+#include "consoleParser.h"
 
 #define DUMP_(treePtr) { \
   strncpy((treePtr)->infoData->lastUsedFileName,     __FILE__,            MAX_FILE_NAME_SIZE); \
@@ -46,7 +20,9 @@ const size_t MAX_HEADER_SIZE      = 500;
   binaryTreeDump(treePtr);                                                                     \
 }
 
-#define SAVE_DUMP_IMAGE(treePtr) { \
+#define SAVE_DUMP_IMAGE(treePtr) {                                      \
+  DUMP_(tree);                                                          \
+                                                                        \
   char *buffer = (char *)calloc(MAX_CMD_BUFFER_SIZE, sizeof(char));     \
   customWarning(buffer != NULL, BAD_BUFFER_POINTER);                    \
                                                                         \
@@ -64,95 +40,37 @@ const size_t MAX_HEADER_SIZE      = 500;
   FREE_(newFileName);                                                   \
 }
 
-struct binaryTreeInfo {
-  char       *bornFileName         = {};
-  char       *bornFunctionName     = {};
-  int         bornLine             = {};
-  char       *dumpFolderName       = {};
-  const char *dumpFileName         = {};
-  char       *lastUsedFileName     = {};
-  char       *lastUsedFunctionName = {};
-  int         lastUsedLine         = {};
-  char       *htmlDumpPath         = {};
-};
+#define BINARY_TREE_INITIALIZE(pointer) {                               \
+  treeInitialize(pointer);                                              \
+  treeInfoInitialize(pointer, __FILE__, __PRETTY_FUNCTION__, __LINE__); \
+  parseConsole(argc, argv, pointer);                                    \
+  binaryTreeSetInfo(pointer);                                           \
+}
 
 template<typename DT>
-struct node {
-  DT data      = {};
-  node *left   = NULL;
-  node *right  = NULL;
-  node *parent = NULL;
-};
+inline binaryTreeError treeInitialize  (binaryTree<DT> *tree) {
+  customWarning(tree != NULL, TREE_NULL_POINTER);
 
-template<typename DT>
-struct binaryTree : node<DT> {
-  node<DT> *root           = NULL;
-  uint64_t errorCode       = {};
-  binaryTreeInfo *infoData = NULL;
-};
+  if (nodeInitialize(tree, &tree->root) != NO_ERRORS) {
+    return ROOT_NULL_POINTER;
+  }
 
-enum binaryTreeError {
-  NO_SUCH_FILE          = -1,
-  NO_ERRORS             =  0,
-  TREE_BAD_POINTER      =  1,
-  NODE_BAD_POINTER      =  2,
-  NODE_VALUE_EXIST      =  3,
-  BAD_FILE_NAME_POINTER =  4,
-  BAD_FUNC_NAME_POINTER =  5,
-  BAD_BORN_LINE_VALUE   =  6,
-  BAD_INFO_POINTER      =  7,
-  INFO_NULL_POINTER     =  8,
-  BAD_BUFFER_POINTER    =  9,
-  BAD_HTML_NAME_POINTER = 10,
-  DUMP_FILE_BAD_POINTER = 11
-};
+  tree->root->left  = NULL;
+  tree->root->right = NULL;
 
-// TREE FUNCTION PROTOTYPES //
-template<typename DT> binaryTreeError binaryTreeInitialize    (binaryTree<DT> *tree,        DT rootData          );
-template<typename DT> binaryTreeError binaryTreeDestruct      (binaryTree<DT> *tree                              );
-template<typename DT> binaryTreeError binaryTreeNodeDestruct  (binaryTree<DT> *tree,        node<DT> **node      );
-template<typename DT> binaryTreeError binaryTreeNodeCreate    (binaryTree<DT> *tree,        DT data              );
-template<typename DT> binaryTreeError binaryTreeNodeLink      (node<DT>       *parentNode,  node<DT> *node       );
-template<typename DT> binaryTreeError printBinaryTree         (node<DT>       *root                              );
-template<typename DT> binaryTreeError binaryTreeInfoInitialize(binaryTree<DT> *tree, const char *fileName,
-                                                                                     const char *funcName,
-                                                                                     int   line                  );
-template<typename DT> binaryTreeError binaryTreeInfoDestruct  (binaryTree<DT> *tree                              );
-template<typename DT> binaryTreeError binaryTreeSetInfo       (binaryTree<DT> *tree                              );
-template<typename DT> binaryTreeError binaryTreeDump          (binaryTree<DT> *tree                              );
-template<typename DT> binaryTreeError binaryTreeNodeDumpLink  (FILE *dumpFile,              node<DT> *node       );
-template<typename DT> binaryTreeError writeHtmlHeader         (binaryTree<DT> *tree                              );
-// TREE FUNCTION PROTOTYPES //
-
-// OTHER FUNCTION PROTOTYPES //
-template<typename DT> char           *setDumpFileName         (binaryTree<DT> *tree);
-// OTHER FUNCTION PROTOTYPES //
-
-template<typename DT> binaryTreeError binaryTreeInitialize(binaryTree<DT> *tree, DT rootData) {
-  customWarning(tree != NULL, TREE_BAD_POINTER);
-
-  node<DT> *treeRoot = (node<DT> *)calloc(1, sizeof(node<DT>));
-  CHECK_ERROR(tree, treeRoot != NULL, NODE_BAD_POINTER);
-
-  tree->root         = treeRoot;
-  tree->root->data   = rootData;
-  tree->root->left   = NULL;
-  tree->root->right  = NULL;
-  tree->root->parent = NULL;
-
-  tree->infoData     = (binaryTreeInfo *)calloc(1, sizeof(binaryTreeInfo));
-  CHECK_ERROR(tree, tree->infoData != NULL, BAD_INFO_POINTER);
+  // TODO VERIFY
 
   return NO_ERRORS;
 }
 
-template<typename DT> binaryTreeError binaryTreeDestruct(binaryTree<DT> *tree) {
-  customWarning(tree != NULL, TREE_BAD_POINTER);
+template<typename DT>
+inline binaryTreeError treeDestruct(binaryTree<DT> *tree) {
+  customWarning(tree != NULL, TREE_NULL_POINTER);
 
   SAVE_DUMP_IMAGE(tree);
 
   if (tree->root) {
-    binaryTreeNodeDestruct(tree, &(tree->root));
+    nodeDestruct(tree, &(tree->root));
   }
 
   DUMP_(tree);
@@ -162,103 +80,198 @@ template<typename DT> binaryTreeError binaryTreeDestruct(binaryTree<DT> *tree) {
   return NO_ERRORS;
 }
 
-template<typename DT> binaryTreeError binaryTreeNodeDestruct(binaryTree<DT> *tree, node<DT> **node) {
-  customWarning(*node != NULL, NODE_BAD_POINTER);
+template<typename DT>
+inline binaryTreeError nodeInitialize  (binaryTree<DT> *tree, node<DT>      **currentNode) {
+  *currentNode = (node<DT> *)calloc(1, sizeof(node<DT>));
 
-  if ((*node)->left) {
-    binaryTreeNodeDestruct(tree, &((*node)->left));
+  customWarning(*currentNode != NULL, NODE_NULL_POINTER);
+
+  if (tree->infoData) {
+    DUMP_(tree);
   }
-
-  if ((*node)->right) {
-    binaryTreeNodeDestruct(tree, &((*node)->right));
-  }
-
-  DUMP_(tree)
-
-  FREE_(*node);
 
   return NO_ERRORS;
 }
 
-template<typename DT> binaryTreeError binaryTreeNodeCreate(binaryTree<DT> *tree, DT data) {
-  customWarning(tree != NULL, TREE_BAD_POINTER);
 
-  node<DT> *treeNode = (node<DT> *)calloc(1, sizeof(node<DT>));
-  CHECK_ERROR(tree, treeNode != NULL, NODE_BAD_POINTER);
+template<typename DT>
+inline binaryTreeError nodeLink        (binaryTree<DT> *tree, node<DT> *currentNode, linkDirection direction) {
+  customWarning(tree != NULL, TREE_NULL_POINTER);
+  customWarning(currentNode != NULL, NODE_NULL_POINTER);
 
-  treeNode->data   = data;
-  treeNode->left   = NULL;
-  treeNode->right  = NULL;
-  treeNode->parent = NULL;
+  node<DT> **childNode = NULL;
 
-  if (binaryTreeNodeLink(tree->root, treeNode) == NODE_VALUE_EXIST) {
-    FREE_(treeNode);
+  switch (direction) {
+    case LEFT:
+      {
+        childNode = &(currentNode->left);
+        break;
+      }
+
+    case RIGHT:
+      {
+        childNode = &(currentNode->right);
+        break;
+      }
+
+    case PARENT:
+    default:
+      {
+        return NO_ERRORS;
+        break;
+      }
   }
+
+  if (*childNode) {
+    return NODE_USED;
+  }
+
+  node<DT> *newNode = {};
+  nodeInitialize(tree, &newNode);
+
+  newNode->parent =    currentNode;
+  newNode->left   =    NULL;
+  newNode->right  =    NULL;
+  *childNode          = newNode;
 
   DUMP_(tree);
 
   return NO_ERRORS;
 }
 
-template<typename DT> binaryTreeError binaryTreeNodeLink(node<DT> *parentNode, node<DT> *node) {
-  customWarning(parentNode != NULL, NODE_BAD_POINTER);
-  customWarning(node       != NULL, NODE_BAD_POINTER);
+template<typename DT>
+inline binaryTreeError nodeDestruct(binaryTree<DT> *tree, node<DT> **currentNode) {
+  customWarning(tree         != NULL, TREE_NULL_POINTER);
+  customWarning(*currentNode != NULL, NODE_NULL_POINTER);
 
-  DT parentValue = parentNode->data;
-  DT nodeValue   = node->data;
-
-  if (nodeValue == parentValue) {
-    return NODE_VALUE_EXIST;
+  if ((*currentNode)->left) {
+    nodeDestruct(tree, &((*currentNode)->left));
   }
 
-  if (nodeValue > parentValue) {
-    if (parentNode->right == NULL) {
-      parentNode->right = node;
-      node->parent      = parentNode;
-    }
-
-    else {
-      parentNode = parentNode->right;
-      binaryTreeNodeLink(parentNode, node);
-    }
+  if ((*currentNode)->right) {
+    nodeDestruct(tree, &((*currentNode)->right));
   }
 
-  if (nodeValue < parentValue) {
-    if (parentNode->left == NULL) {
-      parentNode->left = node;
-      node->parent     = parentNode;
-    }
+  DUMP_(tree);
 
-    else {
-      parentNode = parentNode->left;
-      binaryTreeNodeLink(parentNode, node);
-    }
+  FREE_(*currentNode);
+
+  return NO_ERRORS;
+}
+
+template<typename DT>
+inline binaryTreeError callPrintBinaryTree (binaryTree<DT> *tree, printType type, FILE *stream) {
+  customWarning(tree   != NULL, TREE_NULL_POINTER);
+  customWarning(stream != NULL, BAD_STREAM_POINTER);
+
+  printBinaryTree(tree->root, type, stream);
+}
+
+template<typename DT>
+inline binaryTreeError printBinaryTree     (node<DT>       *currentNode, printType type, FILE *stream) {
+  customWarning(currentNode   != NULL, NODE_NULL_POINTER);
+  customWarning(stream != NULL, BAD_STREAM_POINTER);
+
+  fprintf(stream, "( )");
+
+  if (type == PREFIX) {
+    printNode(currentNode);
+  }
+
+  if (currentNode->left) {
+    printBinaryTree(currentNode, type, stream);
+  }
+
+  if (type == INFIX) {
+    printNode(currentNode);
+  }
+
+  if (currentNode->right) {
+    printBinaryTree(currentNode, type, stream);
+  }
+
+  if (type == POSTFIX) {
+    printNode(currentNode);
+  }
+
+  fprintf(stream, " )");
+
+  return NO_ERRORS;
+}
+
+template<typename DT>
+inline binaryTreeError printNode       (node<DT>       *currentNode, FILE *stream) {
+  customWarning(currentNode != NULL, NODE_NULL_POINTER);
+
+  if (currentNode->data) {
+    fprintf(stream, "%d", currentNode->data);
+  }
+
+  else {
+    fprintf(stream, "nul");
   }
 
   return NO_ERRORS;
 }
 
-template<typename DT> binaryTreeError printBinaryTree(node<DT> *node) {
-  customWarning(node != NULL, NODE_BAD_POINTER);
+template<typename DT>
+inline binaryTreeError treeInfoInitialize(binaryTree<DT> *tree, const char *fileName,
+                                                                const char *funcName,
+                                                                int         line) {
+  customWarning(tree     != NULL, TREE_NULL_POINTER);
+  customWarning(fileName != NULL, BAD_FILE_NAME_POINTER);
+  customWarning(funcName != NULL, BAD_FUNC_NAME_POINTER);
+  customWarning(line      > 0,    BAD_BORN_LINE_VALUE);
 
-  printf("(");
+  tree->infoData                       = (binaryTreeInfo *)calloc(1, sizeof(binaryTreeInfo));
 
-  if (node->left) {
-    printBinaryTree(node->left);
-  }
+  customWarning(tree->infoData != NULL, BAD_INFO_POINTER);
 
-  printf(" %d ", node->data);
+  tree->infoData->bornFileName         = (char *)calloc(MAX_FILE_NAME_SIZE,   sizeof(char));
+  tree->infoData->bornFunctionName     = (char *)calloc(MAX_BORN_FUNC_NAME,   sizeof(char));
+  tree->infoData->bornLine             = line;
+  tree->infoData->dumpFolderName       = (char *)calloc(MAX_DUMP_FOLDER_NAME, sizeof(char));
+  tree->infoData->lastUsedFileName     = (char *)calloc(MAX_FILE_NAME_SIZE,   sizeof(char));
+  tree->infoData->lastUsedFunctionName = (char *)calloc(MAX_BORN_FUNC_NAME,   sizeof(char));
+  tree->infoData->lastUsedLine         = line;
+  tree->infoData->htmlDumpPath         = (char *)calloc(MAX_DUMP_FILE_NAME,   sizeof(char));
 
-  if (node->right) {
-    printBinaryTree(node->right);
-  }
+  customWarning(tree->infoData->bornFileName         != NULL, INFO_NULL_POINTER);
+  customWarning(tree->infoData->bornFunctionName     != NULL, INFO_NULL_POINTER);
+  customWarning(tree->infoData->dumpFolderName       != NULL, INFO_NULL_POINTER);
+  customWarning(tree->infoData->lastUsedFileName     != NULL, INFO_NULL_POINTER);
+  customWarning(tree->infoData->lastUsedFunctionName != NULL, INFO_NULL_POINTER);
+  customWarning(tree->infoData->htmlDumpPath         != NULL, INFO_NULL_POINTER);
 
-  printf(")");
+  strncpy(tree->infoData->bornFileName,     fileName, MAX_FILE_NAME_SIZE);
+  strncpy(tree->infoData->bornFunctionName, funcName, MAX_BORN_FUNC_NAME);
 
   return NO_ERRORS;
 }
 
-template<typename DT> char *setDumpFileName(binaryTree<DT> *tree) {
+template<typename DT>
+inline binaryTreeError binaryTreeInfoDestruct(binaryTree<DT> *tree) {
+  customWarning(tree != NULL, TREE_NULL_POINTER);
+
+  FREE_(tree->infoData->bornFileName        );
+  FREE_(tree->infoData->bornFunctionName    );
+  FREE_(tree->infoData->dumpFolderName      );
+  tree->infoData->lastUsedFileName       = {}; // TODO
+  FREE_(tree->infoData->lastUsedFileName    );
+  tree->infoData->lastUsedFunctionName   = {}; // TODO
+  FREE_(tree->infoData->lastUsedFunctionName);
+  FREE_(tree->infoData->htmlDumpPath        );
+
+  tree->infoData->dumpFileName = {};
+  tree->infoData->bornLine     = 0;
+
+  FREE_(tree->infoData);
+
+  return NO_ERRORS;
+}
+
+template<typename DT>
+static char *setDumpFileName(binaryTree<DT> *tree) {
   const time_t currentTime = time(NULL);
   tm localTime = *localtime(&currentTime);
 
@@ -271,192 +284,6 @@ template<typename DT> char *setDumpFileName(binaryTree<DT> *tree) {
                                     localTime.tm_year + 1900,       localTime.tm_hour, localTime.tm_min, localTime.tm_sec);
 
   return fileName;
-}
-
-template<typename DT> binaryTreeError binaryTreeInfoInitialize(binaryTree<DT> *tree, const char *fileName,
-                                                                                     const char *funcName,
-                                                                                           int   line) {
-  customWarning(tree     != NULL, TREE_BAD_POINTER     );
-  customWarning(fileName != NULL, BAD_FILE_NAME_POINTER);
-  customWarning(funcName != NULL, BAD_FUNC_NAME_POINTER);
-  customWarning(line     >     0, BAD_BORN_LINE_VALUE  );
-
-  tree->infoData->bornFileName         = (char *)calloc(MAX_FILE_NAME_SIZE,   sizeof(char));
-  tree->infoData->bornFunctionName     = (char *)calloc(MAX_BORN_FUNC_NAME,   sizeof(char));
-  tree->infoData->bornLine             = line;
-  tree->infoData->dumpFolderName       = (char *)calloc(MAX_DUMP_FOLDER_NAME, sizeof(char));
-  tree->infoData->lastUsedFileName     = (char *)calloc(MAX_FILE_NAME_SIZE,   sizeof(char));
-  tree->infoData->lastUsedFunctionName = (char *)calloc(MAX_BORN_FUNC_NAME,   sizeof(char));
-  tree->infoData->lastUsedLine         = line;
-  tree->infoData->htmlDumpPath         = (char *)calloc(MAX_DUMP_FILE_NAME,   sizeof(char));
-
-  CHECK_ERROR(tree, tree->infoData->bornFileName         != NULL, INFO_NULL_POINTER);
-  CHECK_ERROR(tree, tree->infoData->bornFunctionName     != NULL, INFO_NULL_POINTER);
-  CHECK_ERROR(tree, tree->infoData->dumpFolderName       != NULL, INFO_NULL_POINTER);
-  CHECK_ERROR(tree, tree->infoData->lastUsedFileName     != NULL, INFO_NULL_POINTER);
-  CHECK_ERROR(tree, tree->infoData->lastUsedFunctionName != NULL, INFO_NULL_POINTER);
-  CHECK_ERROR(tree, tree->infoData->htmlDumpPath         != NULL, INFO_NULL_POINTER);
-
-  strncpy(tree->infoData->bornFileName,     fileName, MAX_FILE_NAME_SIZE);
-  strncpy(tree->infoData->bornFunctionName, funcName, MAX_BORN_FUNC_NAME);
-
-  return NO_ERRORS;
-}
-
-template<typename DT> binaryTreeError binaryTreeInfoDestruct(binaryTree<DT> *tree) {
-  customWarning(tree != NULL, TREE_BAD_POINTER);
-
-  FREE_(tree->infoData->bornFileName        );
-  FREE_(tree->infoData->bornFunctionName    );
-  FREE_(tree->infoData->dumpFolderName      );
-  tree->infoData->lastUsedFileName       = {};
-  FREE_(tree->infoData->lastUsedFileName    );
-  tree->infoData->lastUsedFunctionName   = {};
-  FREE_(tree->infoData->lastUsedFunctionName);
-  FREE_(tree->infoData->htmlDumpPath        );
-
-  tree->infoData->dumpFileName = {};
-  tree->infoData->bornLine     = 0;
-
-  FREE_(tree->infoData);
-
-  return NO_ERRORS;
-
-}
-
-template<typename DT> binaryTreeError binaryTreeSetInfo(binaryTree<DT> *tree) {
-  customWarning(tree != NULL, TREE_BAD_POINTER);
-
-  char *buffer = (char *)calloc(MAX_CMD_BUFFER_SIZE, sizeof(char));
-  CHECK_ERROR(tree, buffer != NULL, BAD_BUFFER_POINTER);
-
-  printf("%s\n", tree->infoData->dumpFolderName);
-  snprintf(buffer, MAX_CMD_BUFFER_SIZE, "mkdir -p %s", tree->infoData->dumpFolderName);
-  system(buffer);
-
-  *buffer = {};
-
-  tree->infoData->htmlDumpPath = setDumpFileName(tree);
-  CHECK_ERROR(tree, tree->infoData->htmlDumpPath != NULL, BAD_HTML_NAME_POINTER);
-
-  snprintf(buffer, MAX_CMD_BUFFER_SIZE, "touch %s", tree->infoData->htmlDumpPath);
-  system(buffer);
-
-  FREE_(buffer);
-
-  return NO_ERRORS;
-}
-
-template<typename DT> binaryTreeError binaryTreeDump(binaryTree<DT> *tree) {
-  customWarning(tree != NULL, TREE_BAD_POINTER);
-
-  tree->infoData->dumpFileName = "temp.dot";
-
-  FILE *dumpFile = fopen(tree->infoData->dumpFileName, "w");
-  CHECK_ERROR(tree, dumpFile != NULL, DUMP_FILE_BAD_POINTER);
-
-  // .DOT HEADER //
-  fprintf(dumpFile, "digraph binaryTree {\nsplines=ortho;\nrankdir=HR;\nnodesep=0.4;"
-                    "\nnode [shape=record, fontname=\"JetBrains Mono\", fontsize=\"10\", color=\"gray\", style=\"rounded\"];\n"
-                    "edge [style=dashed, color=\"green\", weight=\"10\", penwidth=\"2\", "
-                    "arrowsize=\"0.4\"];\n");
-  // .DOT HEADER //
-
-  // NODE //
-  binaryTreeNodeDump    (dumpFile, tree->root);
-  binaryTreeNodeDumpLink(dumpFile, tree->root);
-  // NODE //
-
-  fprintf(dumpFile, "}\n");
-
-  char *buffer = (char *)calloc(MAX_CMD_BUFFER_SIZE, sizeof(char));
-  CHECK_ERROR(tree, buffer != NULL, BAD_BUFFER_POINTER);
-
-  fclose(dumpFile);
-
-  snprintf(buffer, MAX_CMD_BUFFER_SIZE, "echo '<div>' >> %s", tree->infoData->htmlDumpPath);
-  system(buffer);
-
-  *buffer = {};
-
-  writeHtmlHeader(tree);
-
-  snprintf(buffer, MAX_CMD_BUFFER_SIZE, "dot -Tsvg %s >> %s",
-          tree->infoData->dumpFileName, tree->infoData->htmlDumpPath);
-  system(buffer);
-
-  *buffer = {};
-
-  snprintf(buffer, MAX_CMD_BUFFER_SIZE, "echo '</div><hr size='2' color='#ff9900'>' >> %s", tree->infoData->htmlDumpPath);
-  system(buffer);
-
-  *buffer = {};
-
-  snprintf(buffer, MAX_CMD_BUFFER_SIZE, "rm -rf temp.svg");
-  system(buffer);
-
-  FREE_(buffer);
-
-  return NO_ERRORS;
-}
-
-template<typename DT> binaryTreeError binaryTreeNodeDump      (FILE *dumpFile, node<DT> *node) {
-  customWarning(dumpFile != NULL, DUMP_FILE_BAD_POINTER);
-  customWarning(node     != NULL, NODE_BAD_POINTER);
-
-  fprintf(dumpFile, "p%p [label = \"{ <p> [%p] | <d> data = [%d] | { <l> [%p] | <r> [%p] }}\"];\n",
-          node, node, node->data, node->left, node->right);
-
-  if (node->left != NULL) {
-      binaryTreeNodeDump(dumpFile, node->left);
-  }
-
-  if (node->right != NULL) {
-      binaryTreeNodeDump(dumpFile, node->right);
-  }
-
-  return NO_ERRORS;
-}
-
-template<typename DT> binaryTreeError binaryTreeNodeDumpLink(FILE *dumpFile, node<DT> *node) {
-  customWarning(dumpFile != NULL, DUMP_FILE_BAD_POINTER);
-  customWarning(node     != NULL, NODE_BAD_POINTER);
-
-  if (node->left != NULL) {
-    fprintf(dumpFile, "p%p:<l> -> p%p\n", node, node->left);
-    binaryTreeNodeDumpLink(dumpFile, node->left);
-  }
-
-  if (node->right != NULL) {
-    fprintf(dumpFile, "p%p:<r> -> p%p\n", node, node->right);
-    binaryTreeNodeDumpLink(dumpFile, node->right);
-  }
-
-  return NO_ERRORS;
-}
-
-template<typename DT> binaryTreeError writeHtmlHeader(binaryTree<DT> *tree) {
-  customWarning(tree != NULL, TREE_BAD_POINTER);
-
-  char *header = (char *)calloc(MAX_HEADER_SIZE, sizeof(char));
-  customWarning(header != NULL, BAD_INFO_POINTER);
-
-  snprintf(header, MAX_HEADER_SIZE, "<br><br><div style='font-size:22px'><b><u>linkedList</u><font color='DeepSkyBlue'>" " [%p]" "</font></b>"
-                                    " at <b><u>%s:%d</u> <u>(%s)</u></b> <font color='DarkOrange'><b><br>born at</b></font>"
-                                    " <b><u>%s:%d</u></b> (%s)<br><br></div>",
-          tree, tree->infoData->lastUsedFileName, tree->infoData->lastUsedLine, tree->infoData->lastUsedFunctionName,
-                tree->infoData->bornFileName,     tree->infoData->bornLine,     tree->infoData->bornFunctionName);
-
-  int openFile = open(tree->infoData->htmlDumpPath, O_WRONLY | O_APPEND);
-  customWarning(openFile != NO_SUCH_FILE, NO_SUCH_FILE);
-
-  ssize_t writeFile = write(openFile, header, MAX_HEADER_SIZE);
-
-  close(openFile);
-
-  FREE_(header);
-
-  return NO_ERRORS;
 }
 
 #endif // BINARY_TREE_H_

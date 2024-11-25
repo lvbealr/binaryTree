@@ -1,23 +1,17 @@
-#include "getopt.h"
-
-#include "consoleParser.h"
+#include "binaryTreeDef.h"
 #include "binaryTree.h"
 
 int main(int argc, char *argv[]) {
-  binaryTree<int> intTree = {};
-  INIT_BINARY_TREE(&intTree, 100);
+  binaryTree<int> tree = {};
+  BINARY_TREE_INITIALIZE(&tree);
 
-  binaryTreeNodeCreate(&intTree, 200);
-  binaryTreeNodeCreate(&intTree, 12);
-  binaryTreeNodeCreate(&intTree, 1488);
-  binaryTreeNodeCreate(&intTree, 228);
-  binaryTreeNodeCreate(&intTree, 50);
-  binaryTreeNodeCreate(&intTree, 37);
-  binaryTreeNodeCreate(&intTree, 98);
-  binaryTreeNodeCreate(&intTree, 1002);
-  binaryTreeNodeCreate(&intTree, 1323);
-  binaryTreeNodeCreate(&intTree, 11);
-  binaryTreeNodeCreate(&intTree, 2);
+  nodeLink(&tree, tree.root, LEFT);
+  tree.root->left->data = 228;
 
-  binaryTreeDestruct(&intTree);
+  nodeLink(&tree, tree.root->left, LEFT);
+  tree.root->left->left->data = 1488;
+
+  treeDestruct(&tree);
+
+  return 0;
 }
