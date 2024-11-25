@@ -89,7 +89,7 @@ template<typename DT>
 binaryTreeError nodeDestruct         (binaryTree<DT> *tree, node<DT>      **node);
 
 template<typename DT>
-binaryTreeError callPrintBinaryTree  (binaryTree<DT> *tree, printType type, FILE *stream);
+binaryTreeError callPrintBinaryTree  (binaryTree<DT> *tree, printType type,        FILE *stream);
 template<typename DT>
 binaryTreeError printBinaryTree      (node<DT>       *currentNode, printType type, FILE *stream);
 template<typename DT>

@@ -71,7 +71,7 @@ The following functions are provided for working with a doubly linked list:
 
 | Function               | Description                             |
 | ---------------------- | --------------------------------------- |
-| `binaryTreeNodeCreate` | **Creating** and **linking** a new node |
+| `nodeLink` | **Creating** and **linking** a new node |
 
 ## ⛏️ Built Using <a name = "built_using"></a>
 
