@@ -33,6 +33,6 @@
 
 # Folder
 build/
-.vscode
+.vscode/
 dumpFolder/
 temp.dot
