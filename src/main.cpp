@@ -5,11 +5,9 @@ int main(int argc, char *argv[]) {
   binaryTree<int> tree = {};
   BINARY_TREE_INITIALIZE(&tree);
 
-  nodeLink(&tree, tree.root, LEFT);
-  tree.root->left->data = 228;
+  nodeLink(&tree, tree.root, 228, LEFT);
 
-  nodeLink(&tree, tree.root->left, LEFT);
-  tree.root->left->left->data = 1488;
+  nodeLink(&tree, tree.root->left, 1488, LEFT);
 
   treeDestruct(&tree);
 

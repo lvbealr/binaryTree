@@ -84,7 +84,7 @@ binaryTreeError treeDestruct           (binaryTree<DT> *tree);
 template<typename DT>
 binaryTreeError nodeInitialize         (binaryTree<DT> *tree, node<DT>      **currentNode);
 template<typename DT>
-binaryTreeError nodeLink               (binaryTree<DT> *tree, node<DT>       *currentNode, linkDirection direction);
+binaryTreeError nodeLink               (binaryTree<DT> *tree, node<DT>       *currentNode, DT data, linkDirection direction);
 template<typename DT>
 binaryTreeError nodeDestruct           (binaryTree<DT> *tree, node<DT>      **node);
 
