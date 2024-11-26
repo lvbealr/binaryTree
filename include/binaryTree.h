@@ -165,6 +165,8 @@ inline binaryTreeError callPrintBinaryTree (binaryTree<DT> *tree, printType type
   customWarning(stream != NULL, BAD_STREAM_POINTER);
 
   printBinaryTree(tree->root, type, stream);
+
+  return NO_ERRORS;
 }
 
 template<typename DT>
@@ -172,29 +174,29 @@ inline binaryTreeError printBinaryTree     (node<DT>       *currentNode, printTy
   customWarning(currentNode   != NULL, NODE_NULL_POINTER);
   customWarning(stream        != NULL, BAD_STREAM_POINTER);
 
-  fprintf(stream, "( )");
+  fprintf(stream, "(");
 
   if (type == PREFIX) {
-    printNode(currentNode);
+    printNode(currentNode, stream);
   }
 
   if (currentNode->left) {
-    printBinaryTree(currentNode, type, stream);
+    printBinaryTree(currentNode->left, type, stream);
   }
 
   if (type == INFIX) {
-    printNode(currentNode);
+    printNode(currentNode, stream);
   }
 
   if (currentNode->right) {
-    printBinaryTree(currentNode, type, stream);
+    printBinaryTree(currentNode->right, type, stream);
   }
 
   if (type == POSTFIX) {
-    printNode(currentNode);
+    printNode(currentNode, stream);
   }
 
-  fprintf(stream, " )");
+  fprintf(stream, ")");
 
   return NO_ERRORS;
 }
