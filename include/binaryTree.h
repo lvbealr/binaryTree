@@ -95,7 +95,7 @@ inline binaryTreeError nodeInitialize  (binaryTree<DT> *tree, node<DT>      **cu
 
 
 template<typename DT>
-inline binaryTreeError nodeLink        (binaryTree<DT> *tree, node<DT> *currentNode, DT data, linkDirection direction) {
+inline binaryTreeError nodeLink        (binaryTree<DT> *tree, node<DT> *currentNode, linkDirection direction) {
   customWarning(tree        != NULL, TREE_NULL_POINTER);
   customWarning(currentNode != NULL, NODE_NULL_POINTER);
 
@@ -129,7 +129,6 @@ inline binaryTreeError nodeLink        (binaryTree<DT> *tree, node<DT> *currentN
   node<DT> *newNode = {};
   nodeInitialize(tree, &newNode);
 
-  newNode->data   =        data;
   newNode->parent = currentNode;
   newNode->left   =        NULL;
   newNode->right  =        NULL;
