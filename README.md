@@ -57,7 +57,7 @@ Once compiled you can run the executable with the following command.
 
 The program will start in manual mode and ask you to enter data for correct operation.
 
-## 🗎 Documentation <a name = "documentation"></a>
+## 📄 Documentation <a name = "documentation"></a>
 
 For convenient use of the program, [Doxygen documentation](https://lvbealr.github.io/) is included with the project.
 
@@ -67,10 +67,10 @@ For convenient use of the program, [Doxygen documentation](https://lvbealr.githu
 ./build/binaryTree --dumpFolder=/path/to/dumpFolder
 ```
 
-The following functions are provided for working with a doubly linked list:
+The following functions are provided for working with a binary tree.
 
-| Function               | Description                             |
-| ---------------------- | --------------------------------------- |
+| Function   | Description                             |
+| ---------- | --------------------------------------- |
 | `nodeLink` | **Creating** and **linking** a new node |
 
 ## ⛏️ Built Using <a name = "built_using"></a>
@@ -79,7 +79,7 @@ The following functions are provided for working with a doubly linked list:
 
 ## ⌛ GraphViz Dump <a name = "graphviz"></a>
 
-To debug a doubly linked list, it is possible to create a graphic dump and save it in **.html** and **.svg** files
+To debug a binary tree, it is possible to create a graphic dump and save it in **.html** and **.svg** files
 
 <img src="https://i.imgur.com/Ew3JufA.png" alt="graphViz dump"></a>
 
