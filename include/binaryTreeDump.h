@@ -128,7 +128,7 @@ template<typename DT> binaryTreeError writeHtmlHeader(binaryTree<DT> *tree) {
   char *header = (char *)calloc(MAX_HEADER_SIZE, sizeof(char));
   customWarning(header != NULL, BAD_INFO_POINTER);
 
-  snprintf(header, MAX_HEADER_SIZE, "<br><br><div style='font-size:22px'><b><u>linkedList</u><font color='DeepSkyBlue'>" " [%p]" "</font></b>"
+  snprintf(header, MAX_HEADER_SIZE, "<br><br><div style='font-size:22px'><b><u>binaryTree</u><font color='DeepSkyBlue'>" " [%p]" "</font></b>"
                                     " at <b><u>%s:%d</u> <u>(%s)</u></b> <font color='DarkOrange'><b><br>born at</b></font>"
                                     " <b><u>%s:%d</u></b> (%s)<br><br></div>",
           tree, tree->infoData->lastUsedFileName, tree->infoData->lastUsedLine, tree->infoData->lastUsedFunctionName,
