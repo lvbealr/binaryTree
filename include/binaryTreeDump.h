@@ -88,7 +88,7 @@ template<typename DT> binaryTreeError binaryTreeNodeDump      (FILE *dumpFile, n
     return NODE_NULL_POINTER;
   }
 
-  fprintf(dumpFile, "p%p [label = \"{ <p> [%p] | <d> data = [%d] | { <l> [%p] | <r> [%p] }}\"];\n",
+  fprintf(dumpFile, "p%p [label = \"{ <p> [%p] | <d> data = [%p] | { <l> [%p] | <r> [%p] }}\"];\n",
           currentNode, currentNode, currentNode->data, currentNode->left, currentNode->right);
 
   if (currentNode->left != NULL) {

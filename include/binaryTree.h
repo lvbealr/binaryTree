@@ -58,8 +58,6 @@ inline binaryTreeError treeInitialize  (binaryTree<DT> *tree) {
   tree->root->left  = NULL;
   tree->root->right = NULL;
 
-  // TODO VERIFY
-
   return NO_ERRORS;
 }
 
@@ -206,7 +204,7 @@ inline binaryTreeError printNode       (node<DT>       *currentNode, FILE *strea
   customWarning(currentNode != NULL, NODE_NULL_POINTER);
 
   if (currentNode->data) {
-    fprintf(stream, "%d", currentNode->data);
+    fprintf(stream, "%x", currentNode->data);
   }
 
   else {
