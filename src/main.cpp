@@ -19,5 +19,7 @@ int main(int argc, char *argv[]) {
   binaryTreeNodeCreate(&intTree, 11);
   binaryTreeNodeCreate(&intTree, 2);
 
+  printBinaryTree(intTree.root);
+
   binaryTreeDestruct(&intTree);
 }

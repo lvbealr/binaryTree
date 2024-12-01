@@ -85,7 +85,7 @@ struct node {
 };
 
 template<typename DT>
-struct binaryTree : node<DT> {
+struct binaryTree {
   node<DT> *root           = NULL;
   uint64_t errorCode       = {};
   binaryTreeInfo *infoData = NULL;
@@ -247,7 +247,7 @@ template<typename DT> binaryTreeError printBinaryTree(node<DT> *node) {
     printBinaryTree(node->left);
   }
 
-  printf(" %d ", node->data);
+  printf(" %p ", node->data);
 
   if (node->right) {
     printBinaryTree(node->right);
